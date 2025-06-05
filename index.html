@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Love Proposal</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script type="module">
+        import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.module.js';
+        window.THREE = THREE;
+    </script>
+</head>
+<body>
+    <div id="page1" class="page active">
+        <div class="container">
+            <img src="images/love.png" alt="Love" class="love-image" />
+            <h1>Will You Be My Forever?</h1>
+            <p class="message">I have something special to ask you...</p>
+            <button id="yesButton">Say Yes 💖</button>
+            <p id="response" class="response"></p>
+        </div>
+    </div>
+
+    <div id="page2" class="page">
+        <div class="container" id="presentationContainer">
+            <!-- Presentation slides will be dynamically inserted here -->
+            <img id="slideImage" src="" alt="Presentation Slide" class="love-image" />
+            <h1 id="slideTitle"></h1>
+            <p id="slideMessage" class="message"></p>
+            <button id="nextButton" style="display:none;">Yesssss 💖</button>
+        </div>
+    </div>
+
+    <div id="page3" class="page">
+        <div class="thank-you-note">
+            <div class="parchment">
+                <p>Thank you... For saying yes. For being my forever.</p>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bg-music" src="Armaan Malik, Shreya Ghoshal - Nodivalandava.mp3" loop></audio>
+    <script src="script.js"></script>
+</body>
+</html>
