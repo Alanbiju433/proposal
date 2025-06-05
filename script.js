@@ -146,8 +146,7 @@ window.addEventListener('load', () => {
     const sendButton = document.getElementById('sendButton');
 
     // Setup WebSocket connection
-    const socket = new WebSocket('ws://localhost:8080');
-
+    const socket = new WebSocket('ws://192.168.0.233:8080');
     socket.addEventListener('open', () => {
         console.log('Connected to WebSocket server');
     });
