@@ -37,29 +37,43 @@ document.getElementById('yesButton').addEventListener('click', () => {
     }, 1000);
 });
 
+const noMessages = [
+    "What?",
+    "Why?",
+    "I know you love me",
+    "I'm not going anywhere",
+];
+let noIndex = 0;
+
+document.getElementById('noButton').addEventListener('click', () => {
+    const responseElem = document.getElementById('response');
+    responseElem.textContent = noMessages[noIndex];
+    noIndex = (noIndex + 1) % noMessages.length;
+});
+
 const presentationSlides = [
     {
-        image: 'love1.png',
+        image: 'images/love1.png',
         title: 'Our Journey Begins',
         message: 'From the moment we met...'
     },
     {
-        image: 'love2.png',
+        image: 'images/love2.png',
         title: 'Memories We Made',
         message: 'Every moment with you is precious.'
     },
     {
-        image: 'love3.png',
+        image: 'images/love3.png',
         title: 'Laughs and Smiles',
         message: 'You light up my world.'
     },
     {
-        image: 'love4.png',
+        image: 'images/love4.png',
         title: 'Dreams Together',
         message: 'Building our future hand in hand.'
     },
     {
-        image: 'love5.png',
+        image: 'images/love5.png',
         title: 'Forever and Always',
         message: 'Will you be mine forever?',
         showYesButton: true
@@ -123,6 +137,85 @@ function showSlide(index) {
 
 window.addEventListener('load', () => {
     playBackgroundMusic();
+    // Fade in thank you note and show cat after 5 seconds
+    const thankYouNote = document.querySelector('.thank-you-note');
+    const cat = document.getElementById('cat');
+    const chatBox = document.getElementById('chatBox');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+    const sendButton = document.getElementById('sendButton');
+
+    // Setup WebSocket connection
+    const socket = new WebSocket('ws://localhost:8080');
+
+    socket.addEventListener('open', () => {
+        console.log('Connected to WebSocket server');
+    });
+
+socket.addEventListener('message', (event) => {
+    if (typeof event.data === 'string') {
+        addMessage(event.data, 'other');
+    } else if (event.data instanceof Blob) {
+        const reader = new FileReader();
+        reader.onload = () => {
+            addMessage(reader.result, 'other');
+        };
+        reader.readAsText(event.data);
+    } else {
+        console.warn('Unknown message data type:', event.data);
+    }
+});
+
+    socket.addEventListener('close', () => {
+        console.log('Disconnected from WebSocket server');
+    });
+
+    // Show cat after fade-in
+    setTimeout(() => {
+        cat.classList.add('visible');
+    }, 5000);
+
+    // Toggle chat box on cat click
+    cat.addEventListener('click', () => {
+        if (chatBox.style.display === 'flex') {
+            chatBox.style.display = 'none';
+        } else {
+            chatBox.style.display = 'flex';
+            chatInput.focus();
+        }
+    });
+
+    // Add message to chat
+    function addMessage(message, sender) {
+        const messageElem = document.createElement('div');
+        const senderLabel = document.createElement('span');
+        senderLabel.style.fontWeight = 'bold';
+        senderLabel.style.marginRight = '8px';
+        senderLabel.textContent = sender === 'user' ? 'You:' : 'Love:';
+        messageElem.appendChild(senderLabel);
+        const messageText = document.createTextNode(message);
+        messageElem.appendChild(messageText);
+        messageElem.className = sender === 'user' ? 'user-message' : 'other-message';
+        chatMessages.appendChild(messageElem);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Handle send button click
+    sendButton.addEventListener('click', () => {
+        const message = chatInput.value.trim();
+        if (message) {
+            addMessage(message, 'user');
+            socket.send(message);
+            chatInput.value = '';
+        }
+    });
+
+    // Handle enter key in input
+    chatInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            sendButton.click();
+        }
+    });
 });
 
 // Three.js scene variables
