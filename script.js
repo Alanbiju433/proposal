@@ -53,27 +53,27 @@ document.getElementById('noButton').addEventListener('click', () => {
 
 const presentationSlides = [
     {
-        image: 'images/love1.png',
+        image: 'love1.png',
         title: 'Our Journey Begins',
         message: 'From the moment we met...'
     },
     {
-        image: 'images/love2.png',
+        image: 'love2.png',
         title: 'Memories We Made',
         message: 'Every moment with you is precious.'
     },
     {
-        image: 'images/love3.png',
+        image: 'love3.png',
         title: 'Laughs and Smiles',
         message: 'You light up my world.'
     },
     {
-        image: 'images/love4.png',
+        image: 'love4.png',
         title: 'Dreams Together',
         message: 'Building our future hand in hand.'
     },
     {
-        image: 'images/love5.png',
+        image: 'love5.png',
         title: 'Forever and Always',
         message: 'Will you be mine forever?',
         showYesButton: true
