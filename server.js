@@ -1,23 +1,26 @@
-const fs = require('fs');
-const https = require('https');
 const WebSocket = require('ws');
 
-// Read SSL certificate and key
-const server = https.createServer({
-  key: fs.readFileSync('key.pem'),
-  cert: fs.readFileSync('cert.pem')
-});
+const wss = new WebSocket.Server({ port: 8080, host: '0.0.0.0' });
 
-// WebSocket server on top of HTTPS
-const wss = new WebSocket.Server({ server });
+let clients = [];
 
-wss.on('connection', (ws) => {
-  console.log('Client connected');
-  ws.on('message', (message) => {
-    console.log('Received:', message);
+wss.on('connection', function connection(ws) {
+  // Add new client
+  clients.push(ws);
+
+  ws.on('message', function incoming(message) {
+    // Broadcast message to all other clients
+    clients.forEach(client => {
+      if (client !== ws && client.readyState === WebSocket.OPEN) {
+        client.send(message);
+      }
+    });
+  });
+
+  ws.on('close', () => {
+    // Remove client on disconnect
+    clients = clients.filter(client => client !== ws);
   });
 });
 
-server.listen(8080, () => {
-  console.log('WebSocket server is running on wss://0.0.0.0:8080');
-});
+console.log('WebSocket server is running on ws://0.0.0.0:8080');
