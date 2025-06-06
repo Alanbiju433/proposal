@@ -53,27 +53,27 @@ document.getElementById('noButton').addEventListener('click', () => {
 
 const presentationSlides = [
     {
-        image: 'love1.png',
+        image: 'images/love1.png',
         title: 'Our Journey Begins',
         message: 'From the moment we met...'
     },
     {
-        image: 'love2.png',
+        image: 'images/love2.png',
         title: 'Memories We Made',
         message: 'Every moment with you is precious.'
     },
     {
-        image: 'love3.png',
+        image: 'images/love3.png',
         title: 'Laughs and Smiles',
         message: 'You light up my world.'
     },
     {
-        image: 'love4.png',
+        image: 'images/love4.png',
         title: 'Dreams Together',
         message: 'Building our future hand in hand.'
     },
     {
-        image: 'love5.png',
+        image: 'images/love5.png',
         title: 'Forever and Always',
         message: 'Will you be mine forever?',
         showYesButton: true
@@ -123,6 +123,17 @@ function showSlide(index) {
             if (nextButton) {
                 nextButton.style.display = 'none';
             }
+            // Hide thank you note after 3 seconds and show cat image
+            const thankYouNote = document.querySelector('.thank-you-note');
+            const cat = document.getElementById('cat');
+            setTimeout(() => {
+                if (thankYouNote) {
+                    thankYouNote.style.opacity = '0';
+                }
+                if (cat) {
+                    cat.classList.add('visible');
+                }
+            }, 3000);
             // Show final yes button event listener
             const finalYesButton = document.getElementById('finalYesButton');
             if (finalYesButton) {
@@ -145,29 +156,46 @@ window.addEventListener('load', () => {
     const chatInput = document.getElementById('chatInput');
     const sendButton = document.getElementById('sendButton');
 
-    // Setup WebSocket connection
-    const socket = new WebSocket('ws://192.168.0.233:8080');
-    socket.addEventListener('open', () => {
-        console.log('Connected to WebSocket server');
-    });
+    // Setup WebSocket connection with reconnection logic
+    let socket;
+    let reconnectInterval = 1000; // Start with 1 second
+    function connect() {
+        socket = new WebSocket('ws://192.168.0.233:8080');
 
-socket.addEventListener('message', (event) => {
-    if (typeof event.data === 'string') {
-        addMessage(event.data, 'other');
-    } else if (event.data instanceof Blob) {
-        const reader = new FileReader();
-        reader.onload = () => {
-            addMessage(reader.result, 'other');
-        };
-        reader.readAsText(event.data);
-    } else {
-        console.warn('Unknown message data type:', event.data);
+        socket.addEventListener('open', () => {
+            console.log('Connected to WebSocket server');
+            reconnectInterval = 1000; // Reset reconnect interval on successful connection
+        });
+
+        socket.addEventListener('message', (event) => {
+            if (typeof event.data === 'string') {
+                addMessage(event.data, 'other');
+            } else if (event.data instanceof Blob) {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    addMessage(reader.result, 'other');
+                };
+                reader.readAsText(event.data);
+            } else {
+                console.warn('Unknown message data type:', event.data);
+            }
+        });
+
+        socket.addEventListener('close', () => {
+            console.log('Disconnected from WebSocket server, attempting to reconnect...');
+            setTimeout(() => {
+                reconnectInterval = Math.min(reconnectInterval * 2, 30000); // Exponential backoff up to 30 seconds
+                connect();
+            }, reconnectInterval);
+        });
+
+        socket.addEventListener('error', (error) => {
+            console.error('WebSocket error:', error);
+            socket.close();
+        });
     }
-});
 
-    socket.addEventListener('close', () => {
-        console.log('Disconnected from WebSocket server');
-    });
+    connect();
 
     // Show cat after fade-in
     setTimeout(() => {
@@ -204,7 +232,11 @@ socket.addEventListener('message', (event) => {
         const message = chatInput.value.trim();
         if (message) {
             addMessage(message, 'user');
-            socket.send(message);
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(message);
+            } else {
+                console.warn('WebSocket is not open. Message not sent.');
+            }
             chatInput.value = '';
         }
     });
