@@ -133,7 +133,7 @@ function showSlide(index) {
                 if (cat) {
                     cat.classList.add('visible');
                 }
-            }, 6000);
+            }, 3000);
             // Show final yes button event listener
             const finalYesButton = document.getElementById('finalYesButton');
             if (finalYesButton) {
@@ -160,7 +160,7 @@ window.addEventListener('load', () => {
     let socket;
     let reconnectInterval = 1000; // Start with 1 second
     function connect() {
-       const socket = new WebSocket('wss://192.168.0.233:8080/')
+        socket = new WebSocket('ws://192.168.0.233:8080');
 
         socket.addEventListener('open', () => {
             console.log('Connected to WebSocket server');
