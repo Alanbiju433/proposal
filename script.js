@@ -133,7 +133,7 @@ function showSlide(index) {
                 if (cat) {
                     cat.classList.add('visible');
                 }
-            }, 3000);
+            }, 6000);
             // Show final yes button event listener
             const finalYesButton = document.getElementById('finalYesButton');
             if (finalYesButton) {
