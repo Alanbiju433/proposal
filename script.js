@@ -160,7 +160,7 @@ window.addEventListener('load', () => {
     let socket;
     let reconnectInterval = 1000; // Start with 1 second
     function connect() {
-        socket = new WebSocket('ws://192.168.0.233:8080');
+       const socket = new WebSocket('wss://192.168.0.233:8080/')
 
         socket.addEventListener('open', () => {
             console.log('Connected to WebSocket server');
